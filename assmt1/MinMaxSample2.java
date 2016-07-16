@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -29,20 +30,20 @@ public class MinMaxSample2 {
 		this.max = max;
 	}
 	
-	public MinMaxSample2 findMinMax(double[] temperatures, int lowerIndex, int upperIndex){
+	public MinMaxSample2 findMinMax(SensorData[] sensorData, int lowerIndex, int upperIndex){
 		double min,max;
 		if(lowerIndex == upperIndex) {
-			min = temperatures[lowerIndex];
-			max = temperatures[upperIndex];
+			min = sensorData[lowerIndex].temperature;
+			max = sensorData[upperIndex].temperature;
 			return new MinMaxSample2(min,max);
 		}
 		if(upperIndex == lowerIndex + 1) {
-			if(temperatures[upperIndex] > temperatures[lowerIndex]){
-				max = temperatures[upperIndex];
-				min = temperatures[lowerIndex];
+			if(sensorData[upperIndex].temperature > sensorData[lowerIndex].temperature){
+				max = sensorData[upperIndex].temperature;
+				min = sensorData[lowerIndex].temperature;
 			} else {
-				max = temperatures[lowerIndex];
-				min = temperatures[upperIndex];
+				max = sensorData[lowerIndex].temperature;
+				min = sensorData[upperIndex].temperature;
 			}
 			return new MinMaxSample2(min,max);
 		}
@@ -55,8 +56,8 @@ public class MinMaxSample2 {
 			int multiplier = findMultiplier(sizeOfPart);
 			splitIndex = (2 * multiplier - 1) + lowerIndex;
 		}
-		MinMaxSample2 leftHalf = new MinMaxSample2().findMinMax(temperatures, lowerIndex, splitIndex);
-		MinMaxSample2 rightHalf = new MinMaxSample2().findMinMax(temperatures, splitIndex + 1, upperIndex);
+		MinMaxSample2 leftHalf = new MinMaxSample2().findMinMax(sensorData, lowerIndex, splitIndex);
+		MinMaxSample2 rightHalf = new MinMaxSample2().findMinMax(sensorData, splitIndex + 1, upperIndex);
 		MinMaxSample2 minMaxResult = new MinMaxSample2();
 		
 		minMaxResult.max = (leftHalf.max > rightHalf.max) ? leftHalf.max : rightHalf.max;
@@ -69,13 +70,18 @@ public class MinMaxSample2 {
 	public static void main(String[] args){
 		MinMaxSample2 minmax = new MinMaxSample2();
 		Scanner scan = new Scanner(System.in);
-		double[] temperatures = new double[10];
-		System.out.println("Enter 10 numbers");
+		ArrayList<SensorData> sensorArray = new ArrayList<SensorData>();
 		for(int index = 0 ; index < 10; index++){
-			temperatures[index] = scan.nextDouble();
+			SensorData sensorData = new SensorData();		
+			System.out.println("Enter id");
+			sensorData.id = scan.nextInt();
+			System.out.println("Enter temperature");
+			sensorData.temperature = scan.nextDouble();
+			sensorArray.add(sensorData);
 		}
 		scan.close();
-		minmax = minmax.findMinMax(temperatures,0,9);
+		SensorData[] sensorData = sensorArray.toArray(new SensorData[sensorArray.size()]);
+		minmax = minmax.findMinMax(sensorData,0,9);
 		System.out.println("Max is " + minmax.max);
 		System.out.println("Min is " + minmax.min);
 	}
