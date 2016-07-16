@@ -1,5 +1,7 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 
 public class MinMaxSample2 {
@@ -9,6 +11,11 @@ public class MinMaxSample2 {
 	
 	public MinMaxSample2(){
 		
+	}
+	
+	public MinMaxSample2(double min, double max){
+		this.min = min;
+		this.max = max;
 	}
 	
 	private boolean shouldDivideSizeEqually(int numberOfTemperatures){
@@ -25,25 +32,21 @@ public class MinMaxSample2 {
 		return (numberOfTemperatures - 2)/4;
 	}
 	
-	public MinMaxSample2(double min, double max){
-		this.min = min;
-		this.max = max;
-	}
 	
 	public MinMaxSample2 findMinMax(SensorData[] sensorData, int lowerIndex, int upperIndex){
 		double min,max;
 		if(lowerIndex == upperIndex) {
-			min = sensorData[lowerIndex].temperature;
-			max = sensorData[upperIndex].temperature;
+			min = sensorData[lowerIndex].getConvertedTemperatureValue();
+			max = sensorData[upperIndex].getConvertedTemperatureValue();
 			return new MinMaxSample2(min,max);
 		}
 		if(upperIndex == lowerIndex + 1) {
-			if(sensorData[upperIndex].temperature > sensorData[lowerIndex].temperature){
-				max = sensorData[upperIndex].temperature;
-				min = sensorData[lowerIndex].temperature;
+			if(sensorData[upperIndex].getConvertedTemperatureValue() > sensorData[lowerIndex].getConvertedTemperatureValue()){
+				max = sensorData[upperIndex].getConvertedTemperatureValue();
+				min = sensorData[lowerIndex].getConvertedTemperatureValue();
 			} else {
-				max = sensorData[lowerIndex].temperature;
-				min = sensorData[upperIndex].temperature;
+				max = sensorData[lowerIndex].getConvertedTemperatureValue();
+				min = sensorData[upperIndex].getConvertedTemperatureValue();
 			}
 			return new MinMaxSample2(min,max);
 		}
@@ -67,21 +70,20 @@ public class MinMaxSample2 {
 	}
 	
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException{
 		MinMaxSample2 minmax = new MinMaxSample2();
-		Scanner scan = new Scanner(System.in);
-		ArrayList<SensorData> sensorArray = new ArrayList<SensorData>();
-		for(int index = 0 ; index < 10; index++){
-			SensorData sensorData = new SensorData();		
-			System.out.println("Enter id");
-			sensorData.id = scan.nextInt();
-			System.out.println("Enter temperature");
-			sensorData.temperature = scan.nextDouble();
-			sensorArray.add(sensorData);
-		}
-		scan.close();
+		ArrayList<SensorData> sensorArray = new ArrayList<SensorData>();		
+		FileReader in = new FileReader(args[0]);
+	    BufferedReader br = new BufferedReader(in);
+	    String sensorStringData = br.readLine();
+	    while (sensorStringData != null) {	    	
+	    	SensorData sensorData = new SensorData(sensorStringData);
+	    	sensorArray.add(sensorData);
+	    	sensorStringData = br.readLine();
+	    }
+	    in.close();
 		SensorData[] sensorData = sensorArray.toArray(new SensorData[sensorArray.size()]);
-		minmax = minmax.findMinMax(sensorData,0,9);
+		minmax = minmax.findMinMax(sensorData,0,sensorData.length - 1);
 		System.out.println("Max is " + minmax.max);
 		System.out.println("Min is " + minmax.min);
 	}
