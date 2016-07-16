@@ -10,6 +10,20 @@ public class MinMaxSample2 {
 		
 	}
 	
+	private boolean shouldDivideSizeEqually(int numberOfTemperatures){
+		
+		boolean shouldDivide = false;
+		// if odd or divisible by 4 then split into two approximately equal halves
+		if(numberOfTemperatures % 2 == 1 || numberOfTemperatures % 4 == 0) {
+			shouldDivide = true;
+		}
+		return shouldDivide;
+	}
+	
+	private int findMultiplier(int numberOfTemperatures){
+		return (numberOfTemperatures - 2)/4;
+	}
+	
 	public MinMaxSample2(double min, double max){
 		this.min = min;
 		this.max = max;
@@ -32,10 +46,17 @@ public class MinMaxSample2 {
 			}
 			return new MinMaxSample2(min,max);
 		}
-		
-		double midIndex = (lowerIndex + upperIndex)/2;
-		MinMaxSample2 leftHalf = new MinMaxSample2().findMinMax(temperatures, lowerIndex, (int)Math.floor(midIndex));
-		MinMaxSample2 rightHalf = new MinMaxSample2().findMinMax(temperatures, (int)Math.ceil(midIndex), upperIndex);
+		int sizeOfPart = upperIndex - lowerIndex + 1;
+		boolean divideEqually = shouldDivideSizeEqually(sizeOfPart);
+		int splitIndex;
+		if(divideEqually) {
+			splitIndex = (lowerIndex + upperIndex)/2;
+		} else {
+			int multiplier = findMultiplier(sizeOfPart);
+			splitIndex = (2 * multiplier - 1) + lowerIndex;
+		}
+		MinMaxSample2 leftHalf = new MinMaxSample2().findMinMax(temperatures, lowerIndex, splitIndex);
+		MinMaxSample2 rightHalf = new MinMaxSample2().findMinMax(temperatures, splitIndex + 1, upperIndex);
 		MinMaxSample2 minMaxResult = new MinMaxSample2();
 		
 		minMaxResult.max = (leftHalf.max > rightHalf.max) ? leftHalf.max : rightHalf.max;
@@ -54,7 +75,7 @@ public class MinMaxSample2 {
 			temperatures[index] = scan.nextDouble();
 		}
 		scan.close();
-		minmax = minmax.findMinMax(temperatures,0,temperatures.length - 1);
+		minmax = minmax.findMinMax(temperatures,0,9);
 		System.out.println("Max is " + minmax.max);
 		System.out.println("Min is " + minmax.min);
 	}
